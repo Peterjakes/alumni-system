@@ -14,23 +14,29 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @if (isset($header))
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
+    <body>
+        <nav class="bg-gray-800 p-4 text-white flex justify-between">
+    <div>
+        @auth
+            @if (Auth::user()->role === 'admin')
+                <a href="{{ route('admin.dashboard') }}" class="mr-4">Admin Dashboard</a>
+            @elseif (Auth::user()->role === 'alumni')
+                <a href="{{ route('alumni.dashboard') }}" class="mr-4">Alumni Dashboard</a>
             @endif
+        @endauth
+    </div>
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
+    <div>
+        @auth
+            <form method="POST" action="{{ route('logout') }}" class="inline">
+                @csrf
+                <button type="submit" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded">Logout</button>
+            </form>
+        @else
+            <a href="{{ route('login') }}" class="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded">Login</a>
+        @endauth
+    </div>
+</nav>
+
     </body>
 </html>
