@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AlumniController;
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +41,13 @@ Route::middleware(['auth', 'ensurerole:admin'])->group(function () {
 Route::middleware(['auth', 'ensurerole:alumni'])->group(function () {
     Route::get('/alumni/dashboard', [AlumniController::class, 'index'])->name('alumni.dashboard');
 });
+
+
+// Only accessible to authenticated admins
+Route::middleware(['auth', 'ensurerole:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('users', UserController::class);
+});
+
 
 
 require __DIR__.'/auth.php';
