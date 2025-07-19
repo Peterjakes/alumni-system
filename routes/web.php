@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SettingsController;
 
 
 /*
@@ -47,6 +48,9 @@ Route::middleware(['auth', 'ensurerole:alumni'])->group(function () {
 Route::middleware(['auth', 'ensurerole:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', UserController::class);
 });
+
+Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 
 
 
