@@ -7,6 +7,7 @@ use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\HomeController;
 
 
 /*
@@ -20,9 +21,10 @@ use App\Http\Controllers\EventController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
