@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\EventController;
 
 
 /*
@@ -51,6 +52,15 @@ Route::middleware(['auth', 'ensurerole:admin'])->prefix('admin')->name('admin.')
 
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
 Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+Route::middleware(['auth', 'ensurerole:admin'])->prefix('admin')->group(function () {
+    Route::resource('events', EventController::class);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/events', [EventController::class, 'index'])->name('events.index');
+    Route::post('/events/{event}/register', [EventController::class, 'register'])->name('events.register');
+});
 
 
 
