@@ -71,6 +71,10 @@ class EventController extends Controller
 
         if (!$user->registeredEvents->contains($event->id)) {
             $user->registeredEvents()->attach($event->id);
+
+            // Send confirmation email
+        Mail::to($user->email)->send(new EventRegistrationConfirmation($event));
+        
         }
 
         return redirect()->route('events.index')->with('success', 'You registered for the event.');
