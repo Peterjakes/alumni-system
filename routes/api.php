@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/mpesa/callback', function (Request $request) {
+    // You can log or update MpesaDonation status here
+    \Log::info('M-Pesa Callback:', $request->all());
+});
