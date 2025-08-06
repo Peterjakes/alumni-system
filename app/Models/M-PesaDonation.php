@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class M-PesaDonation extends Model
+class MPesaDonation extends Model
 {
     use HasFactory;
 }
