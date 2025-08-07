@@ -19,6 +19,10 @@
             <h3 class="text-lg font-semibold">Total Registrations</h3>
             <p class="text-2xl">{{ $registrationsCount }}</p>
         </div>
+        <li>
+    </a>
+</li>
+
     </div>
 </div>
 @endsection

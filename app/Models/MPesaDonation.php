@@ -8,4 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class MPesaDonation extends Model
 {
     use HasFactory;
+    
+    protected $fillable = [
+    'user_id',
+    'amount',
+    'phone',
+    'transaction_id',
+    'status',
+];
+
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

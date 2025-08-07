@@ -8,7 +8,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\MpesaDonationController;
+use App\Http\Controllers\MPesaDonationController;
+use App\Http\Controllers\DonationController;
 
 
 
@@ -66,10 +67,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/events/{event}/register', [EventController::class, 'register'])->name('events.register');
 });
 
-Route::middleware(['auth', 'checkrole:alumni'])->group(function () {
+Route::middleware(['auth', 'ensurerole:alumni'])->group(function () {
     Route::get('/donate', [MpesaDonationController::class, 'create'])->name('donations.create');
     Route::post('/donate', [MpesaDonationController::class, 'store'])->name('donations.store');
 });
+
+// Route::post('/donate', [MpesaDonationController::class, 'store'])->name('donate');
+
+Route::middleware(['auth', 'ensurerole:admin'])->group(function () {
+    Route::get('/admin/donations', [MPesaDonationController::class, 'index'])->name('admin.donations.index');
+});
+
 
 
 

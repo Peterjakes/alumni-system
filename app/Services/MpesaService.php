@@ -31,10 +31,14 @@ class MpesaService
     }
 
     protected function getAccessToken()
-    {
-        $response = Http::withBasicAuth(env('MPESA_CONSUMER_KEY'), env('MPESA_CONSUMER_SECRET'))
-            ->get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials');
+{
+    // TEMP HARDCODE for debugging
+    $consumerKey = 'MQE73PHTGuziBDM0AWAMbNDuGGmE46bVxRXeNZYPGeC5Jw11';
+    $consumerSecret = '0zU4KjtEVBU0GNKUPEDPZxzeWlEYiAW3vSNbGR8AmutXaCJr0444XwIAW8rLhLAe';
 
-        return $response['access_token'];
-    }
+    $response = Http::withBasicAuth($consumerKey, $consumerSecret)
+        ->get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials');
+
+    return $response['access_token'];
+}
 }
