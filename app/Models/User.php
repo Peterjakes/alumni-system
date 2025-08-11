@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,6 +14,8 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
+     * Added 'role', 'status', 'phone', 'graduation_year', 'profile_photo_path'
+     * to allow mass assignment for new user profile and approval features.
      *
      * @var array<int, string>
      */
@@ -22,6 +23,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // Added: 'admin' or 'alumni'
+        'status', // Added: 'pending', 'approved', 'rejected' for user approval
+        'phone', // Added: User's phone number for M-Pesa and contact
+        'graduation_year', // Added: Alumni's graduation year
+        'profile_photo_path', // Added: Path to user's profile photo
     ];
 
     /**
@@ -45,10 +51,20 @@ class User extends Authenticatable
     ];
 
     /**
-     * Many-to-Many: A user can register for many events
+     * Many-to-Many: A user can register for many events.
+     * Defines the relationship where a User can have many registered Events.
      */
     public function registeredEvents()
     {
         return $this->belongsToMany(Event::class, 'event_user');
+    }
+
+    /**
+     * One-to-Many: A user can make many M-Pesa donations.
+     * Defines the relationship where a User can have many MPesaDonations.
+     */
+    public function mpesaDonations()
+    {
+        return $this->hasMany(MPesaDonation::class);
     }
 }

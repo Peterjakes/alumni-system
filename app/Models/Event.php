@@ -11,7 +11,22 @@ class Event extends Model
     use HasFactory;
 
     /**
-     * Many-to-Many: An event can have many users (alumni) registered
+     * The attributes that are mass assignable.
+     * Removed 'price' as events are free. 'image_url' remains.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'title',
+        'description',
+        'event_date',
+        'location',
+        'image_url', // Added: URL for event banner/thumbnail
+    ];
+
+    /**
+     * Many-to-Many: An event can have many users (alumni) registered.
+     * Defines the relationship where an Event can have many attendees (Users).
      */
     public function attendees()
     {
