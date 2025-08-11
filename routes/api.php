@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MPesaDonationController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/mpesa/callback', function (Request $request) {
-    // You can log or update MpesaDonation status here
-    \Log::info('M-Pesa Callback:', $request->all());
-});
+// M-Pesa STK Push Callback URL
+// This route should be publicly accessible as M-Pesa will hit it directly.
+// It should NOT be behind 'auth:sanctum' middleware.
+Route::post('/mpesa/callback', [MPesaDonationController::class, 'callback'])->name('mpesa.callback');
