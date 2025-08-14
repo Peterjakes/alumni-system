@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-         Schema::create('m_pesa_donations', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        $table->decimal('amount', 10, 2);
-        $table->string('phone');
-        $table->string('transaction_id')->nullable();
-        $table->string('status')->default('pending'); // pending, success, failed
-        $table->timestamps();
-    });
+        Schema::create('m_pesa_donations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('name');
+            $table->decimal('amount', 10, 2);
+            $table->string('phone');
+            $table->string('transaction_id')->nullable();
+            $table->string('checkout_request_id')->nullable();
+            $table->string('status')->default('pending');
+            $table->timestamps();
+        });
     }
 
     /**

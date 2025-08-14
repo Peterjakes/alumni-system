@@ -17,6 +17,7 @@ class MPesaDonation extends Model
      */
     protected $fillable = [
         'user_id',
+        'name', // Added name field for donor identification
         'amount',
         'phone',
         'transaction_id',

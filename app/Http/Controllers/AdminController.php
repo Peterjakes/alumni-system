@@ -13,8 +13,9 @@ class AdminController extends Controller
     {
         $usersCount = User::count();
         $eventsCount = Event::count();
-        $registrationsCount = EventRegistration::count();
-
+        // Added registrationsCount from event_user pivot table
+        $registrationsCount = \DB::table('event_user')->count();
+        
         return view('backend.admin.dashboard', compact('usersCount', 'eventsCount', 'registrationsCount'));
     }
 }

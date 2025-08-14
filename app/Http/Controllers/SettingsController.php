@@ -14,15 +14,37 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
+        $user = auth()->user();
+        
+        // Update notification preferences
+        $user->update([
+            'email_notifications' => $request->has('email_notifications'),
+            'event_reminders' => $request->has('event_reminders'),
+            'newsletter' => $request->has('newsletter'),
+            'profile_visibility' => $request->profile_visibility ?? 'public',
+            'contact_visible' => $request->has('contact_visible'),
+        ]);
+
+        return redirect()->route('settings.index')->with('success', 'Settings updated successfully!');
+    }
+
+    public function changePassword(Request $request)
+    {
         $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'current_password' => 'required',
+            'password' => 'required|min:8|confirmed',
         ]);
 
-        $request->user()->update([
-            'password' => Hash::make($request->password),
+        $user = auth()->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password)
         ]);
 
-        return back()->with('status', 'Password updated successfully!');
+        return redirect()->route('settings.index')->with('success', 'Password changed successfully!');
     }
 }

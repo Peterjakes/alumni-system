@@ -35,11 +35,9 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::match(['PATCH', 'PUT'], '/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-
 
 Route::middleware(['auth', 'ensurerole:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -47,6 +45,8 @@ Route::middleware(['auth', 'ensurerole:admin'])->group(function () {
 
 Route::middleware(['auth', 'ensurerole:alumni'])->group(function () {
     Route::get('/alumni/dashboard', [AlumniController::class, 'index'])->name('alumni.dashboard');
+
+    Route::get('/alumni/directory', [AlumniController::class, 'directory'])->name('alumni.directory');
 });
 
 
@@ -57,20 +57,38 @@ Route::middleware(['auth', 'ensurerole:admin'])->prefix('admin')->name('admin.')
 
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
 Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
+Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
 
-Route::middleware(['auth', 'ensurerole:admin'])->prefix('admin')->group(function () {
-    Route::resource('events', EventController::class);
+// Admin Events Management
+Route::middleware(['auth', 'ensurerole:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('events', [EventController::class, 'adminIndex'])->name('events.index');
+    Route::get('events/create', [EventController::class, 'create'])->name('events.create');
+    Route::post('events', [EventController::class, 'store'])->name('events.store');
+    Route::get('events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('events/{event}', [EventController::class, 'update'])->name('events.update');
+    Route::delete('events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
+});;
+
+// -------------------- FRONTEND (Public + Alumni) --------------------
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+
+// Only authenticated users (Alumni) can register for events
+Route::middleware(['auth'])->group(function () {
+    Route::post('/events/{event}/register', [EventController::class, 'register'])->name('events.register');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/events', [EventController::class, 'index'])->name('events.index');
-    Route::post('/events/{event}/register', [EventController::class, 'register'])->name('events.register');
+Route::middleware(['auth', 'ensurerole:alumni'])->group(function () {
+    Route::post('/events/{event}/register', [EventController::class, 'register'])
+        ->name('events.register');
 });
 
 Route::middleware(['auth', 'ensurerole:alumni'])->group(function () {
     Route::get('/donate', [MpesaDonationController::class, 'create'])->name('donations.create');
     Route::post('/donate', [MpesaDonationController::class, 'store'])->name('donations.store');
 });
+
+
 
 // Route::post('/donate', [MpesaDonationController::class, 'store'])->name('donate');
 

@@ -2,31 +2,36 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Seed the users table with an admin and sample alumni.
-     */
     public function run(): void
     {
-        // Created an admin user
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@alumni.com',
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@alumni.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
 
-        // Created a sample alumni user
-        User::create([
-            'name' => 'John Alumni',
-            'email' => 'john@alumni.com',
-            'password' => Hash::make('alumni123'),
-            'role' => 'alumni',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'john@alumni.com'],
+            [
+                'name' => 'John Alumni',
+                'password' => Hash::make('alumni123'),
+                'role' => 'alumni',
+                'email_verified_at' => now(),
+            ]
+        );
+        
+        User::factory()->count(20)->create();
+        
+        $this->command->info('Created your admin, sample alumni, and 20 additional alumni users successfully!');
     }
 }

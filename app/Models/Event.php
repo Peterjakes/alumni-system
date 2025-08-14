@@ -32,4 +32,11 @@ class Event extends Model
     {
         return $this->belongsToMany(User::class, 'event_user');
     }
+
+    public function registeredEvents()
+{
+    return $this->belongsToMany(Event::class, 'event_user', 'user_id', 'event_id')
+                ->withPivot('registered_at')
+                ->withTimestamps();
+}
 }

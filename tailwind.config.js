@@ -8,14 +8,18 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
     ],
-
     theme: {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'ist-red': '#E30613',
+                'ist-red-darker': '#c00510',
+                'ist-dark': '#1a1a1a',
+                'ist-light-gray': '#cccccc',
+            },
         },
     },
-
     plugins: [forms],
 };

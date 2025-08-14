@@ -2,81 +2,122 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Event;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EventRegistrationConfirmation;
+
 
 class EventController extends Controller
 {
-    // Display a list of all events for alumni (public page)
-    public function index()
+    // Frontend events listing for alumni and public
+  public function index()
+{
+    $events = Event::where('event_date', '>=', now())
+        ->orderBy('event_date', 'asc')
+        ->get();
+
+    return view('frontend.events.index', compact('events'));
+}
+
+
+    public function adminIndex()
     {
-        $events = Event::orderBy('event_date', 'asc')->get();
-        return view('frontend.events.index', compact('events'));
+        $events = Event::latest()->paginate(10);
+        return view('backend.events.index', compact('events'));
     }
 
-    // Admin only: Show create form
+    public function show(Event $event)
+    {
+        return view('frontend.events.show', compact('event'));
+    }
+
+    
     public function create()
     {
         return view('backend.events.create');
     }
 
-    // Admin only: Store new event
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required',
-            'event_date' => 'required|date',
+            'description' => 'required|string',
+            'event_date' => 'required|date|after:today',
             'location' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Event::create($request->all());
+        $data = $request->all();
 
-        return redirect()->route('events.index')->with('success', 'Event created successfully.');
+        if ($request->hasFile('image')) {
+            $data['image_url'] = $request->file('image')->store('events', 'public');
+        }
+
+        Event::create($data);
+
+        return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
     }
 
-    // Admin only: Show edit form
     public function edit(Event $event)
     {
         return view('backend.events.edit', compact('event'));
     }
 
-    // Admin only: Update event
     public function update(Request $request, Event $event)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required',
+            'description' => 'required|string',
             'event_date' => 'required|date',
             'location' => 'required|string|max:255',
+            'image' => 'nullable|image|image|mimes:jpeg,png,jpg,gif|max:10240',
         ]);
 
-        $event->update($request->all());
+        $data = $request->all();
 
-        return redirect()->route('events.index')->with('success', 'Event updated successfully.');
-    }
-
-    // Admin only: Delete event
-    public function destroy(Event $event)
-    {
-        $event->delete();
-        return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
-    }
-
-    // Alumni only: Register for event
-    public function register(Event $event)
-    {
-        $user = Auth::user();
-
-        if (!$user->registeredEvents->contains($event->id)) {
-            $user->registeredEvents()->attach($event->id);
-
-            // Send confirmation email
-        Mail::to($user->email)->send(new EventRegistrationConfirmation($event));
-        
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($event->image_url) {
+                Storage::disk('public')->delete($event->image_url);
+            }
+            $data['image_url'] = $request->file('image')->store('events', 'public');
         }
 
-        return redirect()->route('events.index')->with('success', 'You registered for the event.');
+        $event->update($data);
+
+        return redirect()->route('admin.events.index')->with('success', 'Event updated successfully!');
     }
+
+    public function destroy(Event $event)
+    {
+        if ($event->image_url) {
+            Storage::disk('public')->delete($event->image_url);
+        }
+        
+        $event->delete();
+
+        return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully!');
+    }
+
+
+public function register(Request $request, Event $event)
+{
+    $user = auth()->user();
+
+    // Prevent duplicate registration
+    if ($user->registeredEvents()->where('event_id', $event->id)->exists()) {
+        return redirect()->back()->with('error', 'You are already registered for this event.');
+    }
+
+    // Register user
+    $user->registeredEvents()->attach($event->id, ['registered_at' => now()]);
+
+    // Send email
+    Mail::to($user->email)->send(new EventRegistrationConfirmation($event));
+
+    return redirect()->back()->with('success', 'Successfully registered for the event! A confirmation email has been sent.');
+}
+
 }
