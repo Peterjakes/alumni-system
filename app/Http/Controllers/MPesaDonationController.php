@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\MpesaService;
 use App\Models\MPesaDonation;
-use Illuminate\Support\Facades\Log; // Import Log facade
+use Illuminate\Support\Facades\Log; 
 
 class MPesaDonationController extends Controller
 {
