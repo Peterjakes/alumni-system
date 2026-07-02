@@ -10,12 +10,14 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+{
+    if (!Schema::hasColumn('m_pesa_donations', 'checkout_request_id')) {
         Schema::table('m_pesa_donations', function (Blueprint $table) {
             // Add CheckoutRequestID to link STK push to callback
             $table->string('checkout_request_id')->nullable()->after('transaction_id');
         });
     }
+}
 
     /**
      * Reverse the migrations.
