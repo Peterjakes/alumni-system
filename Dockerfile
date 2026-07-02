@@ -27,3 +27,5 @@ COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
 EXPOSE 80
+
+CMD ["sh", "-c", "php artisan migrate --force && apache2-foreground"]
