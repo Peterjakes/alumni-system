@@ -1,23 +1,29 @@
-FROM richarvey/nginx-php-fpm:3.1.6
+FROM php:8.2-apache
+
+RUN apt-get update && apt-get install -y \
+    git curl libpng-dev libonig-dev libxml2-dev \
+    libpq-dev zip unzip \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-ENV SKIP_COMPOSER=1
-ENV WEBROOT=/var/www/html/public
-ENV PHP_ERRORS_STDERR=1
-ENV RUN_SCRIPTS=1
-ENV REAL_IP_HEADER=1
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-ENV LOG_CHANNEL=stderr
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV APP_STORAGE=/var/www/html/storage
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-RUN chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN a2enmod rewrite
 
-EXPOSE 8080
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-CMD ["/start.sh"]
+EXPOSE 80
